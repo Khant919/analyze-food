@@ -5,7 +5,11 @@
  */
 export async function analyzeFoodImage(base64Image) {
   try {
-    const response = await fetch('http://localhost:3001/api/analyze', {
+    // Dynamically resolve backend host so it works on mobile devices over local Wi-Fi
+    const backendHost = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
+    const apiUrl = `http://${backendHost}:3001/api/analyze`;
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
