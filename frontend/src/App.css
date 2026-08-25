@@ -1,0 +1,752 @@
+/* ==========================================================================
+   Clean, Modern, Minimalist Card Aesthetic Styling
+   ========================================================================== */
+
+:root {
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --primary-light: rgba(16, 185, 129, 0.1);
+  --accent: #6366f1;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-sub: #94a3b8;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --radius-xl: 20px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-pill: 9999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-app: #090d16;
+    --card-bg: #131b2e;
+    --card-border: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-sub: #64748b;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* App Container */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  box-sizing: border-box;
+}
+
+/* App Header */
+.app-header {
+  text-align: center;
+  margin-bottom: 28px;
+  max-width: 520px;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.brand-icon {
+  color: var(--primary);
+}
+
+.brand-tagline {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Main Content */
+.main-content {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Error Banner */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+}
+
+.error-icon {
+  flex-shrink: 0;
+  color: #ef4444;
+}
+
+.error-text {
+  flex: 1;
+  text-align: left;
+}
+
+.error-dismiss-btn {
+  background: none;
+  border: none;
+  color: #991b1b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ==========================================================================
+   Capture Card (Camera & Upload)
+   ========================================================================== */
+
+.capture-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.2s ease;
+}
+
+/* Toggle Switch */
+.toggle-container {
+  display: flex;
+  background: var(--bg-app);
+  border: 1px solid var(--card-border);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+}
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: var(--card-bg);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Camera View */
+.camera-view {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+.webcam-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.webcam-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.viewfinder-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.viewfinder-box {
+  width: 72%;
+  height: 72%;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25);
+}
+
+.camera-flip-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.camera-flip-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.camera-actions {
+  width: 100%;
+}
+
+.capture-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.capture-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.capture-btn:active {
+  transform: translateY(1px);
+}
+
+.capture-inner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* Upload Dropzone */
+.dropzone {
+  border: 2px dashed var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 36px 20px;
+  text-align: center;
+  background: var(--bg-app);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dropzone.drag-active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.file-input {
+  display: none;
+}
+
+.dropzone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropzone-icon-wrapper {
+  background: var(--card-bg);
+  padding: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dropzone-icon {
+  color: var(--primary);
+}
+
+.dropzone-title {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.dropzone-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.select-file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   Loading Card
+   ========================================================================== */
+
+.loading-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 40px 24px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.preview-thumbnail-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 2px solid var(--card-border);
+  box-shadow: var(--shadow-md);
+}
+
+.preview-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-line-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 12px 2px var(--primary);
+  animation: scanSweep 2s ease-in-out infinite alternate;
+}
+
+@keyframes scanSweep {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.loading-spinner-wrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.sleek-spinner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--card-border);
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-center-icon {
+  color: var(--primary);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.loading-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.loading-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+
+/* ==========================================================================
+   Nutrition Result Card
+   ========================================================================== */
+
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.result-image-preview {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.scanned-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nutrition-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 18px;
+}
+
+.food-title-group {
+  text-align: left;
+  flex: 1;
+}
+
+.badge-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 6px;
+}
+
+.food-name {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+  text-transform: capitalize;
+}
+
+/* Calories Display */
+.calories-display {
+  text-align: right;
+  background: rgba(249, 115, 22, 0.08);
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.calories-number-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.calories-icon {
+  color: #ea580c;
+}
+
+.calories-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ea580c;
+  line-height: 1;
+}
+
+.calories-unit {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Health Score */
+.health-score-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.health-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.health-score-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.health-score-pill {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-app);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Macronutrient Pills */
+.macros-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.macro-pill {
+  background: var(--bg-app);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 10px;
+  text-align: center;
+  transition: transform 0.15s ease;
+}
+
+.macro-pill:hover {
+  transform: translateY(-2px);
+}
+
+.macro-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.macro-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.macro-sub {
+  font-size: 0.7rem;
+  color: var(--text-sub);
+}
+
+/* Pill specific accents */
+.carb-pill {
+  border-top: 3px solid #3b82f6;
+}
+
+.protein-pill {
+  border-top: 3px solid #10b981;
+}
+
+.fat-pill {
+  border-top: 3px solid #f59e0b;
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.primary-action-btn,
+.secondary-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 18px;
+  border-radius: var(--radius-lg);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.primary-action-btn {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.primary-action-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.primary-action-btn.logged {
+  background: #059669;
+  cursor: default;
+}
+
+.secondary-action-btn {
+  background: var(--bg-app);
+  color: var(--text-main);
+  border: 1px solid var(--card-border);
+}
+
+.secondary-action-btn:hover {
+  background: var(--card-border);
+  transform: translateY(-1px);
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Footer */
+.app-footer {
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 16px 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .calories-display {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+}
