@@ -37,6 +37,8 @@ function getMockFoodAnalysis() {
       protein_g: 42,
       fat_g: 28,
       health_score: 9,
+      dietary_tags: ['High Protein', 'Keto Friendly', 'Rich in Omega-3'],
+      ai_coach_tip: 'Excellent choice! High in lean protein and heart-healthy fats that keep you energized.',
     },
     {
       food_name: 'Chicken Rice & Steamed Veggies',
@@ -45,6 +47,8 @@ function getMockFoodAnalysis() {
       protein_g: 38,
       fat_g: 12,
       health_score: 8,
+      dietary_tags: ['Balanced Macros', 'Lean Protein', 'Low Fat'],
+      ai_coach_tip: 'Great post-workout balance of clean carbs and protein to replenish muscle glycogen.',
     },
     {
       food_name: 'Classic Cheeseburger',
@@ -53,6 +57,8 @@ function getMockFoodAnalysis() {
       protein_g: 32,
       fat_g: 36,
       health_score: 5,
+      dietary_tags: ['High Sodium', 'High Calorie', 'High Protein'],
+      ai_coach_tip: 'Consider pairing with water and a side salad to balance sodium intake.',
     },
   ];
   return sampleDishes[Math.floor(Math.random() * sampleDishes.length)];
@@ -62,7 +68,7 @@ function getMockFoodAnalysis() {
  * Analyzes a food image using Gemini and returns nutritional information.
  * @param {string} base64Image - Base64 encoded image string (with or without data URL prefix)
  * @param {string} [mimeType='image/jpeg'] - MIME type of the image
- * @returns {Promise<{food_name: string, calories: number, carbs_g: number, protein_g: number, fat_g: number, health_score: number}>}
+ * @returns {Promise<{food_name: string, calories: number, carbs_g: number, protein_g: number, fat_g: number, health_score: number, dietary_tags: string[], ai_coach_tip: string}>}
  */
 export async function analyzeFoodImage(base64Image, mimeType = 'image/jpeg') {
   if (useMock) {
@@ -92,7 +98,9 @@ Return ONLY a valid JSON object with the following exact structure:
   "carbs_g": number,
   "protein_g": number,
   "fat_g": number,
-  "health_score": number
+  "health_score": number,
+  "dietary_tags": ["string"],
+  "ai_coach_tip": "string"
 }
 
 Rules:
@@ -102,6 +110,8 @@ Rules:
 - protein_g: Estimated protein in grams as a number.
 - fat_g: Estimated fat in grams as a number.
 - health_score: A healthiness rating from 1 to 10 (10 being healthiest/most nutritious).
+- dietary_tags: An array of up to 3 concise badges (e.g. "High Protein", "Low Carb", "High Sodium", "Keto Friendly", "Gluten Free", "High Fiber").
+- ai_coach_tip: A short, 1-sentence actionable health or dietary tip regarding this meal.
 - Output MUST strictly be valid JSON adhering to these fields.`;
 
   const imagePart = {
@@ -127,6 +137,11 @@ Rules:
       const responseText = result.response.text();
 
       const parsedData = JSON.parse(responseText);
+      
+      // Ensure defaults if missing
+      parsedData.dietary_tags = Array.isArray(parsedData.dietary_tags) ? parsedData.dietary_tags.slice(0, 3) : [];
+      parsedData.ai_coach_tip = parsedData.ai_coach_tip || 'A balanced meal with essential nutrients.';
+
       return parsedData;
     } catch (error) {
       lastError = error;

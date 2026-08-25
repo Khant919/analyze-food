@@ -4,6 +4,17 @@ import { BarChart3, TrendingUp, Calendar, Zap, CheckCircle2 } from 'lucide-react
 const DAILY_TARGET = 2000;
 
 /**
+ * Checks if two Date objects fall on the same local calendar day.
+ */
+function isSameCalendarDay(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+/**
  * Builds an array of the last 7 calendar days with aggregated nutritional data.
  */
 function build7DaysData(weeklyMeals = []) {
@@ -11,22 +22,19 @@ function build7DaysData(weeklyMeals = []) {
   const today = new Date();
 
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    d.setHours(0, 0, 0, 0);
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() - i);
 
-    const nextDay = new Date(d);
-    nextDay.setDate(nextDay.getDate() + 1);
-
-    // Format labels
     const isToday = i === 0;
-    const dayLabel = isToday ? 'Today' : d.toLocaleDateString([], { weekday: 'short' });
-    const dateLabel = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const dayLabel = isToday ? 'Today' : targetDate.toLocaleDateString([], { weekday: 'short' });
+    const dateLabel = targetDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const dateKey = `${targetDate.getFullYear()}-${targetDate.getMonth() + 1}-${targetDate.getDate()}`;
 
-    // Aggregate meals logged on this date
+    // Aggregate all meals logged on this exact calendar date
     const dayMeals = weeklyMeals.filter((meal) => {
+      if (!meal?.created_at) return false;
       const mealDate = new Date(meal.created_at);
-      return mealDate >= d && mealDate < nextDay;
+      return isSameCalendarDay(mealDate, targetDate);
     });
 
     const calories = dayMeals.reduce((sum, m) => sum + (Number(m.calories) || 0), 0);
@@ -35,7 +43,7 @@ function build7DaysData(weeklyMeals = []) {
     const fat = dayMeals.reduce((sum, m) => sum + (Number(m.fat_g) || 0), 0);
 
     days.push({
-      dateKey: d.toISOString().split('T')[0],
+      dateKey,
       dayLabel,
       dateLabel,
       isToday,
@@ -57,15 +65,20 @@ function build7DaysData(weeklyMeals = []) {
  */
 export default function WeeklyChart({ weeklyMeals = [] }) {
   const daysData = build7DaysData(weeklyMeals);
-  const [selectedDay, setSelectedDay] = useState(daysData[daysData.length - 1]); // defaults to Today
+  
+  // Track selected dateKey rather than stale object so updates are reactive
+  const [selectedDateKey, setSelectedDateKey] = useState(null);
+
+  // Derive the active selected day dynamically
+  const todayDay = daysData[daysData.length - 1];
+  const selectedDay = daysData.find((d) => d.dateKey === selectedDateKey) || todayDay;
 
   // Calculate statistics
   const totalWeeklyCalories = daysData.reduce((acc, d) => acc + d.calories, 0);
-  const activeDaysCount = daysData.filter((d) => d.calories > 0).length || 1;
   const avgDailyCalories = Math.round(totalWeeklyCalories / 7);
 
-  // Maximum calorie scale for vertical bar heights (min 2200 to give room)
-  const maxCalories = Math.max(...daysData.map((d) => d.calories), DAILY_TARGET * 1.1, 2400);
+  // Maximum calorie scale for vertical bar heights (min 2400 to leave headroom)
+  const maxCalories = Math.max(...daysData.map((d) => d.calories), DAILY_TARGET * 1.15, 2400);
 
   return (
     <div className="weekly-chart-card">
@@ -112,10 +125,10 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
               <div
                 key={day.dateKey}
                 className={`chart-bar-column ${day.isToday ? 'today-col' : ''} ${isSelected ? 'selected' : ''}`}
-                onClick={() => setSelectedDay(day)}
+                onClick={() => setSelectedDateKey(day.dateKey)}
                 title={`${day.dayLabel} (${day.dateLabel}): ${day.calories} kcal`}
               >
-                {/* Value on top of bar if active */}
+                {/* Value on top of bar */}
                 <div className="bar-top-value">
                   {day.calories > 0 ? `${day.calories}` : '0'}
                 </div>
@@ -124,7 +137,7 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
                 <div className="bar-track">
                   <div
                     className={`bar-fill ${day.isToday ? 'bar-today' : ''} ${isOverTarget ? 'bar-over' : ''}`}
-                    style={{ height: `${Math.max(heightPercent, day.calories > 0 ? 6 : 2)}%` }}
+                    style={{ height: `${Math.max(heightPercent, day.calories > 0 ? 8 : 2)}%` }}
                   />
                 </div>
 

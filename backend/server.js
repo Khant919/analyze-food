@@ -36,6 +36,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend server is running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend server is running on http://localhost:${PORT} and accessible across your local network at http://192.168.100.44:${PORT}`);
 });

@@ -12,19 +12,31 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
 
 /**
- * Fetches all meal records logged today (since 00:00:00 local time).
+ * Checks if two dates fall on the same local calendar day.
+ */
+function isSameCalendarDay(d1, d2) {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+/**
+ * Fetches all meal records logged today in local calendar time.
  * @returns {Promise<Array<Object>>} List of today's meal records
  */
 export async function getTodaysMeals() {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startOfTodayIso = today.toISOString();
+    // 1. Fetch recent records from the last 2 days to account for any timezone offsets
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    twoDaysAgo.setHours(0, 0, 0, 0);
 
     const { data, error } = await supabase
       .from('meals')
       .select('*')
-      .gte('created_at', startOfTodayIso)
+      .gte('created_at', twoDaysAgo.toISOString())
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -32,7 +44,15 @@ export async function getTodaysMeals() {
       throw error;
     }
 
-    return data || [];
+    const today = new Date();
+    // Filter to items matching today's local calendar day
+    const todaysMeals = (data || []).filter((meal) => {
+      if (!meal?.created_at) return false;
+      const mealDate = new Date(meal.created_at);
+      return isSameCalendarDay(mealDate, today);
+    });
+
+    return todaysMeals;
   } catch (error) {
     console.error('Failed to get today meals:', error);
     throw error;
@@ -45,15 +65,14 @@ export async function getTodaysMeals() {
  */
 export async function getWeeklyMeals() {
   try {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-    const startIso = sevenDaysAgo.toISOString();
+    const eightDaysAgo = new Date();
+    eightDaysAgo.setDate(eightDaysAgo.getDate() - 7);
+    eightDaysAgo.setHours(0, 0, 0, 0);
 
     const { data, error } = await supabase
       .from('meals')
       .select('*')
-      .gte('created_at', startIso)
+      .gte('created_at', eightDaysAgo.toISOString())
       .order('created_at', { ascending: true });
 
     if (error) {
