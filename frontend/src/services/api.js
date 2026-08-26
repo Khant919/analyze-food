@@ -5,9 +5,10 @@
  */
 export async function analyzeFoodImage(base64Image) {
   try {
-    // Dynamically resolve backend host so it works on mobile devices over local Wi-Fi
+    // Use environment variable if provided (e.g. Render backend URL in production),
+    // otherwise fallback dynamically to local network host
     const backendHost = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
-    const apiUrl = `http://${backendHost}:3001/api/analyze`;
+    const apiUrl = import.meta.env.VITE_API_URL || `http://${backendHost}:3001/api/analyze`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
