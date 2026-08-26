@@ -503,14 +503,17 @@
 }
 
 .file-input {
-  display: none;
-}
-
-.dropzone-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .dropzone-icon-wrapper {
@@ -539,22 +542,51 @@
   margin-bottom: 20px;
 }
 
+.upload-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+}
+
 .select-file-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: var(--card-bg);
-  color: var(--primary);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 11px 24px;
+  padding: 12px 20px;
   border-radius: var(--radius-pill);
   font-weight: 700;
   font-size: 0.92rem;
   box-shadow: var(--shadow-sm);
   transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  flex: 1 1 180px;
 }
 
-.select-file-btn:hover {
+.select-file-btn.primary-action {
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary);
+}
+
+.select-file-btn.primary-action:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.select-file-btn.secondary-action {
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.select-file-btn.secondary-action:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
 }

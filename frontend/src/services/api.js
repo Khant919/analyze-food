@@ -5,10 +5,26 @@
  */
 export async function analyzeFoodImage(base64Image) {
   try {
-    // Use environment variable if provided (e.g. Render backend URL in production),
-    // otherwise fallback dynamically to local network host
-    const backendHost = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
-    const apiUrl = import.meta.env.VITE_API_URL || `http://${backendHost}:3001/api/analyze`;
+    let baseUrl = import.meta.env.VITE_API_URL;
+    let apiUrl;
+
+    if (baseUrl && baseUrl.trim() !== '') {
+      // Clean up whitespace & trailing slashes
+      baseUrl = baseUrl.trim().replace(/\/+$/, '');
+      // Append /api/analyze if only the base Render domain was entered
+      if (!baseUrl.endsWith('/api/analyze') && !baseUrl.endsWith('/analyze')) {
+        apiUrl = `${baseUrl}/api/analyze`;
+      } else {
+        apiUrl = baseUrl;
+      }
+    } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      apiUrl = 'http://localhost:3001/api/analyze';
+    } else {
+      // Deployed to production (Netlify) without VITE_API_URL configured
+      throw new Error(
+        'Backend URL is not configured! Please set VITE_API_URL in Netlify (Site configuration -> Environment variables) to your Render URL (e.g. https://your-backend.onrender.com) and redeploy.'
+      );
+    }
 
     const response = await fetch(apiUrl, {
       method: 'POST',
