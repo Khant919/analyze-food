@@ -90,7 +90,15 @@ export async function analyzeFoodImage(base64Image, mimeType = 'image/jpeg') {
     cleanBase64 = parts[1];
   }
 
-  const prompt = `Analyze this food image and provide nutritional estimation for the entire serving shown.
+  const prompt = `You are an expert nutritionist and visual food analyst.
+Carefully examine this food image and estimate the exact nutritional profile for the visible portion size.
+
+Follow these strict scientific estimation guidelines:
+1. Break down the dish into its visible ingredients and standard portion sizes (e.g. 150g protein, 1 cup carbs, cooking oils/fats).
+2. Use standard USDA nutritional references to calculate grams of Carbs, Protein, and Fat.
+3. Calculate Total Calories using the 4-4-9 macro formula: (carbs_g * 4) + (protein_g * 4) + (fat_g * 9) (+/- 5% for fiber/alcohol).
+4. Be precise, realistic, and consistent. Do not overestimate or guess randomly.
+
 Return ONLY a valid JSON object with the following exact structure:
 {
   "food_name": "string",
@@ -104,14 +112,14 @@ Return ONLY a valid JSON object with the following exact structure:
 }
 
 Rules:
-- food_name: A concise name for the identified dish/food item.
-- calories: Estimated total calories (kcal) as a number.
-- carbs_g: Estimated carbohydrates in grams as a number.
-- protein_g: Estimated protein in grams as a number.
-- fat_g: Estimated fat in grams as a number.
-- health_score: A healthiness rating from 1 to 10 (10 being healthiest/most nutritious).
-- dietary_tags: An array of up to 3 concise badges (e.g. "High Protein", "Low Carb", "High Sodium", "Keto Friendly", "Gluten Free", "High Fiber").
-- ai_coach_tip: A short, 1-sentence actionable health or dietary tip regarding this meal.
+- food_name: Concise name of the dish (e.g., "Grilled Salmon with Quinoa & Steamed Broccoli").
+- calories: Total calculated calories (kcal) rounded to the nearest integer.
+- carbs_g: Total carbohydrates in grams as an integer.
+- protein_g: Total protein in grams as an integer.
+- fat_g: Total fat in grams as an integer.
+- health_score: Nutritional rating from 1 to 10 (10 = whole unrefined superfoods, 1 = ultra-processed junk).
+- dietary_tags: Up to 3 concise tags (e.g. "High Protein", "Low Carb", "Heart Healthy", "High Fiber").
+- ai_coach_tip: 1 concise, actionable nutritional recommendation regarding this meal.
 - Output MUST strictly be valid JSON adhering to these fields.`;
 
   const imagePart = {
@@ -130,6 +138,8 @@ Rules:
         model: modelName,
         generationConfig: {
           responseMimeType: 'application/json',
+          temperature: 0.1, // Low temperature eliminates random variance between runs
+          topP: 0.8,
         },
       });
 
