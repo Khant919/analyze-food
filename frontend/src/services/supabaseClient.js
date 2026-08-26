@@ -59,20 +59,17 @@ export async function getTodaysMeals() {
   }
 }
 
-/**
- * Fetches all meal records logged in the past 7 days.
- * @returns {Promise<Array<Object>>} List of meal records from past 7 days
- */
 export async function getWeeklyMeals() {
   try {
-    const eightDaysAgo = new Date();
-    eightDaysAgo.setDate(eightDaysAgo.getDate() - 7);
-    eightDaysAgo.setHours(0, 0, 0, 0);
+    // Query 14 days of history with local midnight buffer to ensure timezone differences never cut off past days
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+    fourteenDaysAgo.setHours(0, 0, 0, 0);
 
     const { data, error } = await supabase
       .from('meals')
       .select('*')
-      .gte('created_at', eightDaysAgo.toISOString())
+      .gte('created_at', fourteenDaysAgo.toISOString())
       .order('created_at', { ascending: true });
 
     if (error) {

@@ -1,12 +1,44 @@
 import React, { useState } from 'react';
-import { BarChart3, TrendingUp, Calendar, Zap, CheckCircle2 } from 'lucide-react';
+import { BarChart3, TrendingUp, Calendar, Utensils, Flame } from 'lucide-react';
 
 const DAILY_TARGET = 2000;
+
+/**
+ * Safely parse a date string, timestamp, or Date object into a valid local Date
+ */
+function parseMealDate(raw) {
+  if (!raw) return null;
+  if (raw instanceof Date) return isNaN(raw.getTime()) ? null : raw;
+
+  // If it's a number or numeric string timestamp
+  if (typeof raw === 'number' || /^\d+$/.test(String(raw).trim())) {
+    const num = Number(raw);
+    const ms = num < 1e11 ? num * 1000 : num;
+    const d = new Date(ms);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  const str = String(raw).trim();
+
+  // If it's a YYYY-MM-DD or YYYY/MM/DD date string without time, parse local date parts directly
+  // to prevent JS from interpreting it as UTC midnight and shifting the day back
+  const dateMatch = str.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+  if (dateMatch && !str.includes('T') && !str.includes(':')) {
+    const year = parseInt(dateMatch[1], 10);
+    const month = parseInt(dateMatch[2], 10) - 1;
+    const day = parseInt(dateMatch[3], 10);
+    return new Date(year, month, day);
+  }
+
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
 
 /**
  * Checks if two Date objects fall on the same local calendar day.
  */
 function isSameCalendarDay(date1, date2) {
+  if (!date1 || !date2) return false;
   return (
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
@@ -28,13 +60,13 @@ function build7DaysData(weeklyMeals = []) {
     const isToday = i === 0;
     const dayLabel = isToday ? 'Today' : targetDate.toLocaleDateString([], { weekday: 'short' });
     const dateLabel = targetDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    const dateKey = `${targetDate.getFullYear()}-${targetDate.getMonth() + 1}-${targetDate.getDate()}`;
+    const dateKey = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}-${String(targetDate.getDate()).padStart(2, '0')}`;
 
     // Aggregate all meals logged on this exact calendar date
     const dayMeals = weeklyMeals.filter((meal) => {
-      if (!meal?.created_at) return false;
-      const mealDate = new Date(meal.created_at);
-      return isSameCalendarDay(mealDate, targetDate);
+      const raw = meal?.created_at || meal?.logged_at || meal?.date || meal?.timestamp;
+      const mealDate = parseMealDate(raw);
+      return mealDate ? isSameCalendarDay(mealDate, targetDate) : false;
     });
 
     const calories = dayMeals.reduce((sum, m) => sum + (Number(m.calories) || 0), 0);
@@ -52,6 +84,7 @@ function build7DaysData(weeklyMeals = []) {
       carbs: Math.round(carbs),
       protein: Math.round(protein),
       fat: Math.round(fat),
+      meals: dayMeals,
     });
   }
 
@@ -104,7 +137,7 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
       {/* Target Guide Line Info */}
       <div className="chart-target-legend">
         <span className="legend-target-line" />
-        <span className="legend-target-text">Daily Target: {DAILY_TARGET.toLocaleString()} kcal</span>
+        <span className="legend-target-text">Daily Target: {DAILY_TARGET.toLocaleString()} kcal (tap any day to view details)</span>
       </div>
 
       {/* 7-Day Vertical Bar Chart */}
@@ -127,6 +160,7 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
                 className={`chart-bar-column ${day.isToday ? 'today-col' : ''} ${isSelected ? 'selected' : ''}`}
                 onClick={() => setSelectedDateKey(day.dateKey)}
                 title={`${day.dayLabel} (${day.dateLabel}): ${day.calories} kcal`}
+                style={{ cursor: 'pointer' }}
               >
                 {/* Value on top of bar */}
                 <div className="bar-top-value">
@@ -137,7 +171,7 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
                 <div className="bar-track">
                   <div
                     className={`bar-fill ${day.isToday ? 'bar-today' : ''} ${isOverTarget ? 'bar-over' : ''}`}
-                    style={{ height: `${Math.max(heightPercent, day.calories > 0 ? 8 : 2)}%` }}
+                    style={{ height: `${Math.max(heightPercent, day.calories > 0 ? 8 : 4)}%` }}
                   />
                 </div>
 
@@ -187,6 +221,23 @@ export default function WeeklyChart({ weeklyMeals = [] }) {
               <strong className="stat-val stat-fat">{selectedDay.fat}g</strong>
             </div>
           </div>
+
+          {/* If there are meals for this day, show a quick itemized breakdown */}
+          {selectedDay.meals && selectedDay.meals.length > 0 && !selectedDay.isToday && (
+            <div style={{ marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>
+                Meals on this day:
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {selectedDay.meals.map((m, idx) => (
+                  <div key={m.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: 'var(--text-main)' }}>
+                    <span>🍽️ {m.food_name}</span>
+                    <strong style={{ color: 'var(--accent)' }}>{Math.round(m.calories || 0)} kcal</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
