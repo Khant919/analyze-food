@@ -18,11 +18,11 @@ const genAI = new GoogleGenerativeAI(apiKey || '', requestOptions);
 // Primary and fallback model names
 const CANDIDATE_MODELS = [
   process.env.GEMINI_MODEL,
-  'gemini-3.6-flash',
-  'gemini-3.7-flash',
-  'gemini-flash-latest',
   'gemini-2.5-flash',
+  'gemini-2.0-flash',
   'gemini-1.5-flash',
+  'gemini-2.5-pro',
+  'gemini-1.5-pro',
 ].filter(Boolean);
 
 /**
