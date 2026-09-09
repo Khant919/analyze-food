@@ -39,7 +39,7 @@ export default function App() {
       setWeeklyMeals([]);
       return;
     }
-
+//delete line
     async function loadData() {
       try {
         setIsLoadingMeals(true);
