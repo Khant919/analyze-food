@@ -32,7 +32,6 @@ export default function App() {
   const [weeklyMeals, setWeeklyMeals] = useState([]);
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
-
   // Fetch meals whenever the authenticated user changes
   useEffect(() => {
     if (!user) {
